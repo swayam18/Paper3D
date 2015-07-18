@@ -91,6 +91,9 @@ class Node:
   def __str__(self):
     return "{},{},{}".format(self.v1,self.v2,self.v3)
 
+  def getVertices(self):
+      return (self.v1,self.v2,self.v3)
+
 # Only adds parent and child information
 class TreeNode:
   def __init__(self,node):
