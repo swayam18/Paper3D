@@ -6,11 +6,17 @@ vertices = [
         array([0,0,0,1]),
         array([10,0,0,1]),
         array([0,10,0,1]),
-        array([10,10,10,1])
+        array([10,10,10,1]),
+        array([10,0,20,1]),
+        array([ 1.7763568394e-15 ,  10.0 ,  1.7763568394e-15 , 1]),
+        array([ 10.0 ,  10.0 ,  10.0, 1 ]),
+        array([ 10.0 ,  20.0 ,  20.0, 1 ])
         ]
 
 triangle1 = [0,1,2]
 triangle2 = [1,2,3]
+triangle3 = [2,3,4]
+triangle4 = [5,7,6]
 
 # normal1 = normal2 * m
 def makeRotationalMatrix(normal1, normal2):
@@ -64,7 +70,6 @@ def getMatrixArbitraryAxis2(point1,point2, angle):
         [t*x*z - s*y, t*y*z + s*x, t*z*z + c,   0],
         [0,           0,           0,           1]])
 
-
 def angleBetween(v1,v2):
     v1_u = unit_vector(v1)
     v2_u = unit_vector(v2)
@@ -76,7 +81,26 @@ def angleBetween(v1,v2):
             return np.pi
     return angle
 
+def getTranslationMatrix(vector):
+    return matrix([
+            [1,0,0,vector[0]],
+            [0,1,0,vector[1]],
+            [0,0,1,vector[2]],
+            [0,0,0,1]])
 
+
+def unfold(edge, triangle, parent):
+    normal1 = getNormal(parent)
+    normal2 = getNormal(triangle)
+    m1 = getTranslationMatrix((-vertices[edge[0]] - vertices[edge[1]])/2)
+    m2 = getMatrixArbitraryAxis2(vertices[edge[0]], vertices[edge[1]], pi-angleBetween(normal1,normal2))
+    m3 = getTranslationMatrix((vertices[edge[0]] + vertices[edge[1]])/2) 
+    points = []
+    for i in triangle:
+        point = ( m3 * m2 * m1 * np.transpose(matrix(vertices[i]))).tolist()
+        print '[',point[0][0],', ',point[1][0],', ',point[2][0],'],'
+        points.append(point)
+    return points
 
 normal1 = getNormal(triangle1)
 normal2 = getNormal(triangle2)
@@ -84,11 +108,15 @@ normal2 = getNormal(triangle2)
 #print normal1
 #print normal2*m
 
-m2 = getMatrixArbitraryAxis2(vertices[1], vertices[2], angleBetween(normal1,normal2)-pi)
-for i in triangle2:
+m2 = getMatrixArbitraryAxis2(vertices[1], vertices[2], pi-angleBetween(normal1,normal2))
+m1 = getTranslationMatrix((-vertices[1] - vertices[2])/2)
+m3 = getTranslationMatrix((vertices[1] + vertices[2])/2) 
+mm = m1*m2*m3
+for i in triangle3:
     #point = (vertices[i] * m2).tolist()[0]
-    point = vertices[i] - (vertices[1] + vertices[2])/2 
-    point = (point * m2)
-    point = point + (vertices[1] + vertices[2])/2 
-    plist = point.tolist()[0]
-    print '[',plist[0],', ',plist[1],', ',plist[2],'],'
+    point = m3 * m2 * m1 * np.transpose(matrix(vertices[i]))
+    plist = point.tolist()
+    print '[',plist[0][0],', ',plist[1][0],', ',plist[2][0],'],'
+
+#print unfold((2,3), triangle3, triangle2)
+unfold((1,2),triangle4,triangle1)
