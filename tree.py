@@ -78,6 +78,7 @@ class TriangleNode:
         else:
             self.vertices = [array(face.v1), array(face.v2), array(face.v3)]
         self.transformed_vertices = self.vertices
+        self.normal = array(face.n)
 
     #edges: (v1,v2) index of vertices
     def addChildren(self,node,edges):

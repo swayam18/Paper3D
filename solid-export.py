@@ -15,7 +15,7 @@ from solid.utils import *
 
 SEGMENTS = 48
 
-triangles = Reader.read("stl/bunny-292.stl")
+triangles = Reader.read("stl/cube.stl")
 g = Graph(triangles)
 msp = g.toMSPTree()
 tn = traverse(msp,set())
