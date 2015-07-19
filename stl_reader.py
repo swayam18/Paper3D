@@ -17,9 +17,9 @@ class Reader:
     return triangles
 
 #triangles = Reader.read("stanford_bunny_309_faces.stl")
-triangles = Reader.read("cube.stl")
-g = Graph(triangles)
-msp = g.toMSPTree()
+#triangles = Reader.read("cube.stl")
+#g = Graph(triangles)
+#msp = g.toMSPTree()
 
 def traverse(node, explored):
   parent = TriangleNode(node.face)

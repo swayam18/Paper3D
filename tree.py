@@ -13,18 +13,30 @@ def getMatrixArbitraryAxis(point1,point2, angle):
         [t*x*z - s*y, t*y*z + s*x, t*z*z + c,   0],
         [0,           0,           0,           1]])
 
+def getMatrixArbitraryAxis2(axis, angle):
+    x,y,z = axis[:3]
+    c = cos(angle)
+    s = sin(angle)
+    t = 1 - c
+    return matrix([
+        [t*x*x + c,   t*x*y - s*z, t*x*z + s*y, 0],
+        [t*x*y + s*z, t*y*y + c,   t*y*z - s*x, 0],
+        [t*x*z - s*y, t*y*z + s*x, t*z*z + c,   0],
+        [0,           0,           0,           1]])
+
 def angleBetween(v1,v2):
     v1_u = unitVector(v1)
     v2_u = unitVector(v2)
     angle = np.arccos(np.dot(v1_u, v2_u))
+    reference = unitVector((array([0,0,1]),v1_u))
     if np.isnan(angle):
         if (v1_u == v2_u).all():
             return 0.0
         else:
             return np.pi
-    if angle >= np.pi/2:
-        angle = 2*pi - angle
-    return angle
+    #if dot(v2_u,reference) < 0:
+        #return -angle
+    return -angle
 
 def getTranslationMatrix(vector):
     return matrix([
@@ -50,7 +62,8 @@ def unitVector(vector):
 
 def getUnfoldingMatrix(parent, child, edge):
     m1 = getTranslationMatrix((-edge[0]-edge[1])/2)
-    m2 = getMatrixArbitraryAxis(edge[0], edge[1], angleBetween(parent.normal,child.normal))
+    axis = unitVector(cross(parent.normal,child.normal))
+    m2 = getMatrixArbitraryAxis2(axis, angleBetween(parent.normal,child.normal))
     m3 = getTranslationMatrix((edge[0]+edge[1])/2)
     return m3 * m2 * m1
 
@@ -65,7 +78,6 @@ class TriangleNode:
         else:
             self.vertices = [array(face.v1), array(face.v2), array(face.v3)]
         self.transformed_vertices = self.vertices
-        self.normal = array(face.n)
 
     #edges: (v1,v2) index of vertices
     def addChildren(self,node,edges):

@@ -1,6 +1,7 @@
 from numpy import linalg
 from numpy import argsort
 from unionfind import UnionFind
+from random import choice
 
 class Graph:
   def __init__(self, triangles):
@@ -38,7 +39,7 @@ class Graph:
       node_v.children.append(node_u)
 
 
-    root = treeNodes[edges[0][0]]
+    root = treeNodes[choice(choice(edges))]
     return root
 
 
