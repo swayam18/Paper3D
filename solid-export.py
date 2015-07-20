@@ -5,8 +5,8 @@ import os
 import sys
 import re
 from numpy import array
-from tree import TriangleNode
-from stl_reader import Reader,traverse,traverse_for_vertices,unfold
+from tree import TriangleNode,traverse,traverse_for_vertices,unfold
+from stl_reader import Reader
 from graph2 import Graph
 
 # Assumes SolidPython is in site-packages or elsewhwere in sys.path
@@ -15,7 +15,7 @@ from solid.utils import *
 
 SEGMENTS = 48
 
-triangles = Reader.read("stl/cube.stl")
+triangles = Reader.read("stl/rhino-quarter.stl")
 g = Graph(triangles)
 msp = g.toMSPTree()
 tn = traverse(msp,set())
