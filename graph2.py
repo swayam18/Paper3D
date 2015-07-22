@@ -39,7 +39,8 @@ class Graph:
       node_v.children.append(node_u)
 
 
-    root = treeNodes[choice(choice(edges))]
+    #root = treeNodes[choice(choice(edges))]
+    root = treeNodes[edges[0][0]]
     return root
 
 
