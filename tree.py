@@ -79,6 +79,9 @@ class TriangleNode:
         for child, edge in self.children:
             child.unfold(unfold_matrix)
 
-    def getTransformedVertices(self):
-        if self.root: return [[ x.tolist() for x in triangleNode.transformed_vertices ]]
+    def getTransformedVertices2D(self):
+        return [ [round(i,5) for i in x][:2] for x in self.transformed_vertices ]
+
+    def getVertices(self):
+        return [x.tolist() for x in self.vertices]
 

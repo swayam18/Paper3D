@@ -57,11 +57,11 @@ def checkLineIntersection(point1, point2, pointA, pointB):
    p,q = pointA
    r,s = pointB
    det = float((c - a) * (q - s) - (p - r) * (d - b))
-   if det == 0: 
+   if det == 0:
        return False
-   l = ((q - s) * (p - a) + (r - p) * (q - b)) / det
-   g = ((b - d) * (p - a) + (c - a) * (q - b)) / det
-   return (0 <= l and l <= 1) and (0 <= g and g <= 1)
+   l = round(((q - s) * (p - a) + (r - p) * (q - b)) / det,5)
+   g = round(((b - d) * (p - a) + (c - a) * (q - b)) / det,5)
+   return (0.0 < l and l < 1.0) and (0.0 < g and g < 1.0)
 
 #print checkLineIntersection((0,0),(1,1),(0,1),(1,0))
 
@@ -75,20 +75,46 @@ def checkPointInTriangle(point, vertices):
     return b1 == b2 and b1 == b3
 
 def checkTriangleIntersection(t1,t2):
-    #check 2 edges
-    if checkLineIntersection(t1[0],t1[1],t2[0],t2[1]):
-        return True
-    if checkLineIntersection(t1[1],t1[2],t2[1],t2[2]):
-        return True
-    if checkPointInTriangle(t1[0],t2):
-        return True
-    if checkPointInTriangle(t2[0],t1):
-        return True
-    else:
-        return False
+    for i in range(3):
+        for j in range(3):
+            if checkLineIntersection(t1[i],t1[(i+1)%3],t2[j],t2[(j+1)%3]):
+                return True
+    t1 = [tuple(x) for x in t1]
+    t2 = [tuple(x) for x in t2]
+    s1 = set(t1)
+    s2 = set(t2)
+    _s1 = s1 - s2
+    _s2 = s2 - s1
+    if len(_s1) == 0: return False
+    for v in _s1:
+        if checkPointInTriangle(v,t2):
+            return True
+    for v in _s2:
+        if checkPointInTriangle(v,t1):
+            return True
+    return False
+    
 
-print checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(0.5,0),(0,0.5)])
-print checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(1,0),(0,1)])
-print checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(-1,0),(0,-1)])
-print checkTriangleIntersection([(0,0),(1,0),(0,1)],[(-0.1,-0.1),(-1,0),(0,-1)])
-print checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0.1,0.1),(0.5,0.1),(0.1,0.5)])
+def checkTriangleIntersections(t1, triangles):
+    for t in triangles:
+        if checkTriangleIntersection(t1,t): return True
+    return False
+
+def findIntersectingTriangles(node, triangles):
+    out = [node] if checkTriangleIntersections(node.getTransformedVertices2D(), triangles) else []
+    if len(node.children) == 0:
+        return out
+    else:
+        for child, edge in node.children:
+            out.extend(findIntersectingTriangles(child, triangles))
+        return out
+
+#assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(0.5,0),(0,0.5)]))
+#assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(1,0),(0,1)]))
+#assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(1,0),(0,0.5)]))
+#assert(not checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(-1,0),(0,-1)]))
+#assert(not checkTriangleIntersection([(0,0),(1,0),(0,1)],[(-0.1,-0.1),(-1,0),(0,-1)]))
+#assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0.1,0.1),(0.5,0.1),(0.1,0.5)]))
+#assert(not checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,1),(1,0),(1,1)]))
+#assert(not checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(0,1),(-1,0)]))
+#assert(not checkTriangleIntersection([[-12.04447, -1.52985], [7.34713, -9.66589], [4.69735, 11.19574]],[[26.73872, -17.80193], [24.08894, 3.0597], [7.34713, -9.66589]]))
