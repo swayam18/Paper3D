@@ -59,8 +59,8 @@ def checkLineIntersection(point1, point2, pointA, pointB):
    det = float((c - a) * (q - s) - (p - r) * (d - b))
    if det == 0:
        return False
-   l = round(((q - s) * (p - a) + (r - p) * (q - b)) / det,5)
-   g = round(((b - d) * (p - a) + (c - a) * (q - b)) / det,5)
+   l = round(((q - s) * (p - a) + (r - p) * (q - b)) / det,6)
+   g = round(((b - d) * (p - a) + (c - a) * (q - b)) / det,6)
    return (0.0 < l and l < 1.0) and (0.0 < g and g < 1.0)
 
 #print checkLineIntersection((0,0),(1,1),(0,1),(1,0))

@@ -10,7 +10,7 @@ def getUnfoldingMatrix(normal1, normal2, edge):
     m3 = getTranslationMatrix((edge[0]+edge[1])/2)
     return m3 * m2 * m1
 
-def traverse(node, explored):
+def traverse(node, explored=set()):
   parent = TriangleNode(node.face)
   explored.add(node)
   if len(node.children) == 1 and node.children[0] in explored:
@@ -47,6 +47,7 @@ def unfold(triangleNode):
 class TriangleNode:
     def __init__(self,face):
         #child is a tuple: (TriangleNode, edges(v1,v2))
+        self.node = face
         self.root = False
         self.children = []
         #[(x,y,z),(x,y,z)] in anti-clockwise
@@ -82,6 +83,13 @@ class TriangleNode:
     def getTransformedVertices2D(self):
         return [ [round(i,5) for i in x][:2] for x in self.transformed_vertices ]
 
-    def getVertices(self):
-        return [x.tolist() for x in self.vertices]
+    def checkIntersection(self):
+        v = traverse_for_vertices(self)
+        vertices2D = [[[round(i,5) for i in y][:2] for y in x] for x in v]
+        return findIntersectingTriangles(self,vertices2D)
 
+    def rotateToFlat(self):
+        up = array([0,0,1])
+        axis = unitVector(cross(up, self.normal))
+        m = getMatrixArbitraryAxis(axis, angleBetween(up,self.normal))
+        self.unfold(m)

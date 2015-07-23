@@ -2,6 +2,7 @@ from numpy import linalg
 from numpy import argsort
 from unionfind import UnionFind
 from random import choice
+import tree
 
 class Graph:
   def __init__(self, triangles):
@@ -63,6 +64,8 @@ class Graph:
           if i == j: continue
           weight = self.connected(self.nodes[i], self.nodes[j])
           if weight != float("inf"):
+            self.nodes[i].children.add(j)
+            self.nodes[j].children.add(i)
             self.edges.append((i,j))
             self.weights.append(weight)
 
@@ -75,6 +78,34 @@ class Graph:
           return weight
     return float("inf")
 
+  def brute_force(self):
+     stack = [0]
+     root = None
+     parent_node = None 
+     explored = set()
+     while stack:
+         node = self.nodes[stack.pop()]
+         explored.add(node)
+         treenode = TreeNode(node)
+         if root == None:
+             root = treenode
+             parent_node = treenode
+         else: 
+             parent_node.children.append(treenode)
+         tn = tree.traverse(root)
+         unfold(tn)
+         tn.rotateToFlat()
+         if tn.checkIntersection() == []:
+             for child in node.children:
+                 if child not in explored:
+                     stack.append(child)
+
+      # check for intersection
+      # if intersection return false
+      # if not call _brute_force as a parent
+
+
+
 
 # Every Node is a triangular face
 class Node:
@@ -85,6 +116,7 @@ class Node:
     self.n = normal
 
     self.edges = [(v1, v2), (v2, v3), (v3, v1)]
+    self.children = set()
     self.edge_lengths = map(linalg.norm, self.edges)
 
   def __repr__(self):
@@ -94,10 +126,11 @@ class Node:
     return "{},{},{}".format(self.v1,self.v2,self.v3)
 
   def getVertices(self):
-      return (self.v1,self.v2,self.v3)
+    return (self.v1,self.v2,self.v3)
 
 # Only adds parent and child information
 class TreeNode:
   def __init__(self,node):
     self.face = node
     self.children = []
+

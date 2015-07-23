@@ -21,13 +21,10 @@ SEGMENTS = 48
 triangles = Reader.read("stl/rhino-quarter.stl")
 g = Graph(triangles)
 msp = g.toMSPTree()
-tn = traverse(msp,set())
+tn = traverse(msp)
 tn.root = True
 unfold(tn)
-up = array([0,0,1])
-axis = tree.unitVector(cross(up, tn.normal))
-m = getMatrixArbitraryAxis(axis, tree.angleBetween(up,tn.normal))
-tn.unfold(m)
+tn.rotateToFlat()
 v = traverse_for_vertices(tn)
 vertices = reduce(lambda x,y: x+y, v)
 #print vertices
@@ -36,7 +33,9 @@ vertices2D = [ [ [round(i,5) for i in y][:2] for y in x] for x in v ]
 #print vertices2D
 #print tn.getTransformedVertices()[:2]
 #print utilities.checkTriangleIntersections(tn.getTransformedVertices2D(), vertices2D)
-x = findIntersectingTriangles(tn, vertices2D)
+xs = findIntersectingTriangles(tn, vertices2D)
+print len(xs)
+print [x.node for x in xs]
 
 def assembly():
     a = polyhedron(
@@ -45,8 +44,8 @@ def assembly():
     return a
 
 def intersecting():
-    a = polygon(points=x[0].getTransformedVertices2D())
-    for xx in x[1:]:
+    a = polygon(points=xs[0].getTransformedVertices2D())
+    for xx in xs[1:]:
         a += polygon(points=xx.getTransformedVertices2D())
     return a
 

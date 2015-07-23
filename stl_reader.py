@@ -15,3 +15,8 @@ class Reader:
       t = [triangle[0:3], triangle[3:6], triangle[6:9], normal]
       triangles.append(t)
     return triangles
+
+
+triangles = Reader.read("stl/rhino-quarter.stl")
+g = Graph(triangles)
+g.brute_force()
