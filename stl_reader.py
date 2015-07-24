@@ -1,10 +1,15 @@
 import numpy
-from graph2 import Graph
+from graph2 import Graph, TreeNode
 from stl import mesh
 from pprint import pprint
 from copy import copy
-from tree import TriangleNode
+import tree
+from tree import TriangleNode, parseArrayIntoTree
 
+from solid import *
+from solid.utils import *
+
+SEGMENTS = 48
 
 class Reader:
   @staticmethod
@@ -16,7 +21,22 @@ class Reader:
       triangles.append(t)
     return triangles
 
-
-triangles = Reader.read("stl/rhino-quarter.stl")
+triangles = Reader.read("stl/cube.stl")
 g = Graph(triangles)
-g.brute_force()
+msp = g.toMSPTree()
+array = msp.makeArrayRepresentation(len(g.nodes))
+print array
+tn = parseArrayIntoTree(g.nodes, array)
+tn.unfold()
+v = tn.getAllChildVertices()
+
+def assembly():
+    a = polyhedron(
+            points=v,
+            triangles=[[x for x in range(y,y+3)] for y in range(0,len(v),3)])
+    return a
+
+if __name__ == '__main__':
+    a = assembly()
+    #a = intersecting()
+    scad_render_to_file(a,'test.scad', file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)

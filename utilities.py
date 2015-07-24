@@ -2,6 +2,33 @@ import numpy as np
 from numpy import matrix, linalg, cross, dot, array
 from math import cos, sin, pi
 
+
+def memoize(f):
+    """ Memoization decorator for a function taking one or more arguments. """
+    class memodict(dict):
+        def __getitem__(self, *key):
+            return dict.__getitem__(self, key)
+
+        def __missing__(self, key):
+            ret = self[key] = f(*key)
+            return ret
+
+    return memodict().__getitem__
+
+def flatternMatrixArray(array):
+    return reduce(lambda m1,m2: matrixMultiply(m1,m2), array)
+
+@memoize
+def matrixMultiply(m1,m2):
+    return m1*m2
+
+def getUnfoldingMatrix(normal1, normal2, edge):
+    m1 = getTranslationMatrix((-edge[0]-edge[1])/2)
+    axis = unitVector(cross(normal1,normal2))
+    m2 = getMatrixArbitraryAxis(axis, angleBetween(normal1,normal2))
+    m3 = getTranslationMatrix((edge[0]+edge[1])/2)
+    return m3 * m2 * m1
+
 def getMatrixArbitraryAxis(axis, angle):
     x,y,z = axis[:3]
     c = cos(angle)
@@ -23,8 +50,6 @@ def angleBetween(v1,v2):
             return 0.0
         else:
             return np.pi
-    #if dot(v2_u,reference) < 0:
-        #return -angle
     return -angle
 
 def getTranslationMatrix(vector):

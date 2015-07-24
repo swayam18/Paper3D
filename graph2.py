@@ -13,14 +13,16 @@ class Graph:
     self.l_min = float("inf")
     self.l_max = 0.0
 
-    for t in triangles:
+    for i,t in enumerate(triangles):
       v1 = t[0].tolist()
       v2 = t[1].tolist()
       v3 = t[2].tolist()
       n = t[3].tolist()
-
+      
       node = Node(v1,v2,v3,n)
+      node.index = i
       self.nodes.append(node)
+
 
       self.l_min = min(self.l_min, min(node.edge_lengths))
       self.l_max = max(self.l_max, max(node.edge_lengths))
@@ -44,7 +46,6 @@ class Graph:
     root = treeNodes[edges[0][0]]
     return root
 
-
   def mspEdges(self):
     A = []
     N = len(self.nodes)
@@ -59,15 +60,15 @@ class Graph:
     return A
 
   def generate_edges(self):
-      for i in xrange(len(self.nodes)):
-        for j in xrange(i,len(self.nodes)):
-          if i == j: continue
-          weight = self.connected(self.nodes[i], self.nodes[j])
-          if weight != float("inf"):
-            self.nodes[i].children.add(j)
-            self.nodes[j].children.add(i)
-            self.edges.append((i,j))
-            self.weights.append(weight)
+    for i in xrange(len(self.nodes)):
+      for j in xrange(i,len(self.nodes)):
+        if i == j: continue
+        weight = self.connected(self.nodes[i], self.nodes[j])
+        if weight != float("inf"):
+          self.nodes[i].children.add(j)
+          self.nodes[j].children.add(i)
+          self.edges.append((i,j))
+          self.weights.append(weight)
 
   def connected(self, node1, node2):
     for i, node1edge in enumerate(node1.edges):
@@ -78,38 +79,10 @@ class Graph:
           return weight
     return float("inf")
 
-  def brute_force(self):
-     stack = [0]
-     root = None
-     parent_node = None 
-     explored = set()
-     while stack:
-         node = self.nodes[stack.pop()]
-         explored.add(node)
-         treenode = TreeNode(node)
-         if root == None:
-             root = treenode
-             parent_node = treenode
-         else: 
-             parent_node.children.append(treenode)
-         tn = tree.traverse(root)
-         unfold(tn)
-         tn.rotateToFlat()
-         if tn.checkIntersection() == []:
-             for child in node.children:
-                 if child not in explored:
-                     stack.append(child)
-
-      # check for intersection
-      # if intersection return false
-      # if not call _brute_force as a parent
-
-
-
-
 # Every Node is a triangular face
 class Node:
   def __init__(self, v1, v2, v3, normal):
+    self.index = -1
     self.v1=v1
     self.v2=v2
     self.v3=v3
@@ -134,3 +107,22 @@ class TreeNode:
     self.face = node
     self.children = []
 
+  def checkIntersection(self):
+    tn = tree.traverse(self,set())
+    tn.root = True
+    tree.unfold(tn)
+    tn.rotateToFlat()
+    return tn.checkIntersection()
+
+  def makeArrayRepresentation(self,size):
+    array = [-1] * size 
+    stack = [self]
+    explored = set()
+    while stack:
+      node = stack.pop()
+      explored.add(node)
+      for child in node.children:
+        if child not in explored:
+          array[child.face.index] = node.face.index
+          stack.append(child)
+    return array
