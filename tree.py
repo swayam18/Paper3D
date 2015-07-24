@@ -2,10 +2,9 @@ from numpy import matrix, linalg, cross, dot, array
 import numpy as np
 import utilities
 from math import cos, sin, pi
-from utilities import getMatrixArbitraryAxis, angleBetween, getTranslationMatrix, getNormal, unitVector, getUnfoldingMatrix, flatternMatrixArray
+from utilities import getMatrixArbitraryAxis, angleBetween, getTranslationMatrix, getNormal, unitVector, getUnfoldingMatrix, flatternMatrixArray, vertex_close_enough
 
 def parseArrayIntoTree(nodes, array):
-    print [x.index for x in nodes]
     root = TriangleNode(nodes[array.index(-1)]).makeRoot()
     stack = [root]
     while stack:
@@ -16,7 +15,7 @@ def parseArrayIntoTree(nodes, array):
             edges = []
             for v1 in parent.node.getVertices():
               for v2 in child.node.getVertices():
-                if v1 == v2:
+                if vertex_close_enough(v1,v2):
                   edges.append(v1)
             assert(len(edges)==2)
             parent.addChild(child,edges)
@@ -65,7 +64,7 @@ class TriangleNode:
         return [[ round(i,5) for i in x][:2] for x in self.transformed_vertices ]
 
     def checkIntersection(self):
-        v = traverse_for_vertices(self)
+        v = self.getAllChildVertices2D()
         vertices2D = [[[round(i,5) for i in y][:2] for y in x] for x in v]
         return utilities.findIntersectingTriangles(self,vertices2D)
 

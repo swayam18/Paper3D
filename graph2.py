@@ -1,7 +1,9 @@
+import numpy as np
 from numpy import linalg
 from numpy import argsort
 from unionfind import UnionFind
 from random import choice
+from utilities import close_enough
 import tree
 
 class Graph:
@@ -73,9 +75,9 @@ class Graph:
   def connected(self, node1, node2):
     for i, node1edge in enumerate(node1.edges):
       for j, node2edge in enumerate(node2.edges):
-        if node1edge == node2edge or node1edge[::-1] == node2edge:
+        if close_enough(node1edge,node2edge) or close_enough(node1edge[::-1],node2edge):
           # minimum perimeter heuristic to the edge
-          weight = (self.l_max - node1.edge_lengths[i])/(self.l_max - self.l_min)
+          weight = -(self.l_max - node1.edge_lengths[i])/(self.l_max - self.l_min)
           return weight
     return float("inf")
 
@@ -126,3 +128,11 @@ class TreeNode:
           array[child.face.index] = node.face.index
           stack.append(child)
     return array
+
+def treeLength(msp,explored):
+  explored.add(msp)
+  u_children = 1
+  for child in msp.children:
+    if child not in explored:
+      u_children += treeLength(child,explored)
+  return u_children

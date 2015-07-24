@@ -9,7 +9,7 @@ import utilities
 from numpy import array,cross
 from tree import TriangleNode, parseArrayIntoTree
 from stl_reader import Reader
-from graph2 import Graph,TreeNode
+from graph2 import Graph,TreeNode,treeLength
 from utilities import getMatrixArbitraryAxis, findIntersectingTriangles
 
 # Assumes SolidPython is in site-packages or elsewhwere in sys.path
@@ -18,10 +18,13 @@ from solid.utils import *
 
 SEGMENTS = 48
 
-triangles = Reader.read("stl/rhino-quarter.stl")
+triangles = Reader.read("stl/sphere.stl")
 g = Graph(triangles)
 msp = g.toMSPTree()
 array_rep = msp.makeArrayRepresentation(len(g.nodes))
+print array_rep
+print len(array_rep)
+print treeLength(msp,set())
 tn = parseArrayIntoTree(g.nodes, array_rep)
 tn.unfold()
 v = tn.getAllChildVertices()
@@ -43,6 +46,6 @@ def intersecting():
     return a
 
 if __name__ == '__main__':
-    #a = assembly()
-    a = intersecting()
+    a = assembly()
+    #a = intersecting()
     scad_render_to_file(a,'unfold.scad', file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)

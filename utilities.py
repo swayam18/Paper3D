@@ -2,6 +2,30 @@ import numpy as np
 from numpy import matrix, linalg, cross, dot, array
 from math import cos, sin, pi
 
+eps = 0.0001
+def close_enough(edge1, edge2):
+    # edge: (v1,v2)
+    e1v1 = edge1[0]
+    e1v2 = edge1[1]
+    e2v1 = edge2[0]
+    e2v2 = edge2[1]
+
+    diff_x = abs(e1v1[0] - e2v1[0]) < eps
+    diff_y = abs(e1v1[1] - e2v1[1]) < eps 
+    diff_z = abs(e1v1[2] - e2v1[2]) < eps
+    s = diff_x and diff_y and diff_z
+    diff_x = abs(e1v2[0] - e2v2[0]) < eps
+    diff_y = abs(e1v2[1] - e2v2[1]) < eps 
+    diff_z = abs(e1v2[2] - e2v2[2]) < eps
+    a = diff_x and diff_y and diff_z
+
+    return a and s
+
+def vertex_close_enough(v1,v2):
+    diff_x = abs(v1[0] - v2[0]) < eps
+    diff_y = abs(v1[1] - v2[1]) < eps 
+    diff_z = abs(v1[2] - v2[2]) < eps
+    return diff_x and diff_y and diff_z
 
 def memoize(f):
     """ Memoization decorator for a function taking one or more arguments. """
