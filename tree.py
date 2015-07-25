@@ -64,9 +64,17 @@ class TriangleNode:
         return [[ round(i,5) for i in x][:2] for x in self.transformed_vertices ]
 
     def checkIntersection(self):
-        v = self.getAllChildVertices2D()
-        vertices2D = [[[round(i,5) for i in y][:2] for y in x] for x in v]
-        return utilities.findIntersectingTriangles(self,vertices2D)
+        v = self._getAllFaceVertices2D()
+        return self._checkIntersection(v)
+
+    def _checkIntersection(self, triangles):
+        out = [self] if utilities.checkTriangleIntersections(self.getTransformedVertices2D(), triangles) else []
+        if len(self.children) == 0:
+            return out
+        else:
+            for child, edge in self.children:
+                out.extend(child._checkIntersection(triangles))
+            return out
 
     def _getAllChildVertices(self):
         face_vertex = [[ x.tolist() for x in self.transformed_vertices ]]
@@ -75,6 +83,15 @@ class TriangleNode:
         else:
             for child,edges in self.children:
               face_vertex.extend(child._getAllChildVertices())
+            return face_vertex
+
+    def _getAllFaceVertices2D(self):
+        face_vertex = [self.getTransformedVertices2D()]
+        if len(self.children) == 0:
+            return face_vertex
+        else:
+            for child,edges in self.children:
+              face_vertex.extend(child._getAllFaceVertices2D())
             return face_vertex
 
     def getAllChildVertices(self):

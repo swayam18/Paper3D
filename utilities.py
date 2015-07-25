@@ -149,15 +149,6 @@ def checkTriangleIntersections(t1, triangles):
         if checkTriangleIntersection(t1,t): return True
     return False
 
-def findIntersectingTriangles(node, triangles):
-    out = [node] if checkTriangleIntersections(node.getTransformedVertices2D(), triangles) else []
-    if len(node.children) == 0:
-        return out
-    else:
-        for child, edge in node.children:
-            out.extend(findIntersectingTriangles(child, triangles))
-        return out
-
 #assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(0.5,0),(0,0.5)]))
 #assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(1,0),(0,1)]))
 #assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(1,0),(0,0.5)]))
