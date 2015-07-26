@@ -1,64 +1,33 @@
 from numpy import matrix, linalg, cross, dot, array
 import numpy as np
+import utilities
 from math import cos, sin, pi
-def getMatrixArbitraryAxis(point1,point2, angle):
-    axis = unitVector(point2-point1)
-    x,y,z = axis[:3]
-    c = cos(angle)
-    s = sin(angle)
-    t = 1 - c
-    return matrix([
-        [t*x*x + c,   t*x*y - s*z, t*x*z + s*y, 0],
-        [t*x*y + s*z, t*y*y + c,   t*y*z - s*x, 0],
-        [t*x*z - s*y, t*y*z + s*x, t*z*z + c,   0],
-        [0,           0,           0,           1]])
+from utilities import getMatrixArbitraryAxis, angleBetween, getTranslationMatrix, getNormal, unitVector, getUnfoldingMatrix, flatternMatrixArray, vertex_close_enough
 
-def angleBetween(v1,v2):
-    v1_u = unitVector(v1)
-    v2_u = unitVector(v2)
-    angle = np.arccos(np.dot(v1_u, v2_u))
-    if np.isnan(angle):
-        if (v1_u == v2_u).all():
-            return 0.0
-        else:
-            return np.pi
-    if angle >= np.pi/2:
-        angle = 2*pi - angle
-    return angle
-
-def getTranslationMatrix(vector):
-    return matrix([
-            [1,0,0,vector[0]],
-            [0,1,0,vector[1]],
-            [0,0,1,vector[2]],
-            [0,0,0,1]])
-
-def columnCross(v1,v2):
-    return cross(v1.T[0,0:3],v2.T[0,0:3]).T
-
-def getNormal(vertices):
-    edge1 = vertices[0] - vertices[1]
-    edge2 = vertices[0] - vertices[2]
-    v = cross(edge1[:3], edge2[:3])
-    return np.append(unitVector(v),0)
-
-def unitVector(vector):
-    norm = np.linalg.norm(vector)
-    if norm == 0:
-        return vector
-    return vector / norm
-
-def getUnfoldingMatrix(parent, child, edge):
-    m1 = getTranslationMatrix((-edge[0]-edge[1])/2)
-    m2 = getMatrixArbitraryAxis(edge[0], edge[1], angleBetween(parent.normal,child.normal))
-    m3 = getTranslationMatrix((edge[0]+edge[1])/2)
-    return m3 * m2 * m1
+def parseArrayIntoTree(nodes, array):
+    root = TriangleNode(nodes[array.index(-1)]).makeRoot()
+    stack = [root]
+    while stack:
+        parent = stack.pop(0)
+        idxs = [i for i,x in enumerate(array) if x == parent.node.index]
+        children = [ TriangleNode(nodes[i]) for i in idxs]
+        for child in children:
+            edges = []
+            for v1 in parent.node.getVertices():
+              for v2 in child.node.getVertices():
+                if vertex_close_enough(v1,v2):
+                  edges.append(v1)
+            assert(len(edges)==2)
+            parent.addChild(child,edges)
+        stack.extend(children)
+    return root
 
 class TriangleNode:
     def __init__(self,face):
         #child is a tuple: (TriangleNode, edges(v1,v2))
-        self.root = False
+        self.node = face
         self.children = []
+        self.matrix = []
         #[(x,y,z),(x,y,z)] in anti-clockwise
         if len(face.v1)==3:
             self.vertices = [np.append(face.v1,1),np.append(face.v2,1),np.append(face.v3,1)]
@@ -67,8 +36,14 @@ class TriangleNode:
         self.transformed_vertices = self.vertices
         self.normal = array(face.n)
 
+    def makeRoot(self):
+        up = array([0,0,1])
+        axis = unitVector(cross(up, self.normal))
+        self.matrix = [getMatrixArbitraryAxis(axis, angleBetween(up,self.normal))]
+        return self
+
     #edges: (v1,v2) index of vertices
-    def addChildren(self,node,edges):
+    def addChild(self,node,edges):
         self.children.append([node,[array(edge) for edge in edges]])
         node.setParent(self)
 
@@ -76,19 +51,53 @@ class TriangleNode:
         self.parent = parent
         for node,edges in parent.children:
             if self == node:
-                self.localFlattenMatrix = getUnfoldingMatrix(self.parent,self,edges)
+                self.localFlattenMatrix = getUnfoldingMatrix(self.parent.normal,self.normal,edges)
+                self.matrix = parent.matrix + [self.localFlattenMatrix] 
 
-    def unfold(self, unfold_matrix=None):
-        if self.root: return
-        if unfold_matrix == None:
-            unfold_matrix = self.localFlattenMatrix
+    def unfold(self):
         for i,x in enumerate(self.transformed_vertices):
-            #if x.shape == (4,1):
-                #self.transformed_vertices[i] = unfold_matrix * matrix(x)
-            self.transformed_vertices[i] = array((unfold_matrix * matrix(x).T).T)[0]
+            self.transformed_vertices[i] = array((flatternMatrixArray(self.matrix) * matrix(x).T).T)[0]
         for child, edge in self.children:
-            child.unfold(unfold_matrix)
+            child.unfold()
 
-    def getTransformedVertices(self):
-        if self.root: return [[ x.tolist() for x in triangleNode.transformed_vertices ]]
+    def getTransformedVertices2D(self):
+        return [[ round(i,5) for i in x][:2] for x in self.transformed_vertices ]
 
+    def checkIntersection(self):
+        v = self._getAllFaceVertices2D()
+        return self._checkIntersection(v)
+
+    def _checkIntersection(self, triangles):
+        out = [self] if utilities.checkTriangleIntersections(self.getTransformedVertices2D(), triangles) else []
+        if len(self.children) == 0:
+            return out
+        else:
+            for child, edge in self.children:
+                out.extend(child._checkIntersection(triangles))
+            return out
+
+    def _getAllChildVertices(self):
+        face_vertex = [[ x.tolist() for x in self.transformed_vertices ]]
+        if len(self.children) == 0:
+            return face_vertex
+        else:
+            for child,edges in self.children:
+              face_vertex.extend(child._getAllChildVertices())
+            return face_vertex
+
+    def _getAllFaceVertices2D(self):
+        face_vertex = [self.getTransformedVertices2D()]
+        if len(self.children) == 0:
+            return face_vertex
+        else:
+            for child,edges in self.children:
+              face_vertex.extend(child._getAllFaceVertices2D())
+            return face_vertex
+
+    def getAllChildVertices(self):
+        v = self._getAllChildVertices()
+        return [y[:3] for y in reduce(lambda x,y: x+y, v)]
+
+    def getAllChildVertices2D(self):
+        v = self._getAllChildVertices()
+        return [y[:2] for y in reduce(lambda x,y: x+y, v)]
