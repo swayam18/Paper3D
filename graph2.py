@@ -10,7 +10,7 @@ class Graph:
   def __init__(self, triangles):
     self.nodes = []
     self.edges = []
-    self.weights = []
+    self.edge_ids = []
 
     self.l_min = float("inf")
     self.l_max = 0.0
@@ -20,7 +20,7 @@ class Graph:
       v2 = t[1].tolist()
       v3 = t[2].tolist()
       n = t[3].tolist()
-      
+
       node = Node(v1,v2,v3,n)
       node.index = i
       self.nodes.append(node)
@@ -31,9 +31,12 @@ class Graph:
 
     if self.l_min == self.l_max: self.l_max += 0.0001
     self.generate_edges()
+    self.defaultHeuristic = lambda edge_length: -(self.l_max - edge_length)/(self.l_max - self.l_min)
 
-  def toMSPTree(self):
-    edges = self.mspEdges()
+  def toMSPTree(self, heuristicFn = None):
+    if heuristicFn == None:
+      heuristicFn = self.defaultHeuristic
+    edges = self.mspEdges(heuristicFn)
     treeNodes = [TreeNode(node) for node in self.nodes]
 
     for edge in edges:
@@ -48,12 +51,13 @@ class Graph:
     root = treeNodes[edges[0][0]]
     return root
 
-  def mspEdges(self):
+  def mspEdges(self, heuristicFn):
     A = []
     N = len(self.nodes)
     uf = UnionFind(N)
+    weights = self.generate_weights(heuristicFn)
 
-    order = argsort(self.weights)
+    order = argsort(weights)
     for i in order:
       (u,v) = self.edges[i]
       if not uf.connected(u,v):
@@ -61,25 +65,34 @@ class Graph:
         uf.union(u,v)
     return A
 
+  def getMaxMinLenghts(self):
+    return (self.l_min, self.l_max)
+
+  def generate_weights(self, heuristicFn):
+    weights = []
+    for i,(node1,node2) in enumerate(self.edges):
+      edge_id = self.edge_ids[i]
+      edge = self.nodes[node1].edge_lengths[edge_id]
+      weights.append(heuristicFn(edge))
+    return weights
+
   def generate_edges(self):
     for i in xrange(len(self.nodes)):
       for j in xrange(i,len(self.nodes)):
         if i == j: continue
-        weight = self.connected(self.nodes[i], self.nodes[j])
-        if weight != float("inf"):
+        edge_id = self.connected(self.nodes[i], self.nodes[j])
+        if edge_id != -1:
           self.nodes[i].children.add(j)
           self.nodes[j].children.add(i)
           self.edges.append((i,j))
-          self.weights.append(weight)
+          self.edge_ids.append(edge_id)
 
   def connected(self, node1, node2):
     for i, node1edge in enumerate(node1.edges):
       for j, node2edge in enumerate(node2.edges):
         if close_enough(node1edge,node2edge) or close_enough(node1edge[::-1],node2edge):
-          # minimum perimeter heuristic to the edge
-          weight = -(self.l_max - node1.edge_lengths[i])/(self.l_max - self.l_min)
-          return weight
-    return float("inf")
+          return i
+    return -1
 
 # Every Node is a triangular face
 class Node:
@@ -117,7 +130,7 @@ class TreeNode:
     return tn.checkIntersection()
 
   def makeArrayRepresentation(self,size):
-    array = [-1] * size 
+    array = [-1] * size
     stack = [self]
     explored = set()
     while stack:

@@ -23,6 +23,7 @@ triangles = Reader.read("stl/icosahedron.stl")
 g = Graph(triangles)
 msp = g.toMSPTree()
 array_rep = msp.makeArrayRepresentation(len(g.nodes))
+print array_rep
 print treeLength(msp,set()), "faces"
 tn = parseArrayIntoTree(g.nodes, array_rep)
 tn.unfold()
