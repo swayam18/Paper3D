@@ -150,23 +150,40 @@ def checkTriangleIntersections(t1, triangles):
         if checkTriangleIntersection(t1,t): return True
     return False
 
-def makeKDTree(triangles, bbMin = [float('inf'),float('inf')], bbMax = [float('-inf'),float('-inf')], axis = 0):
-    kdnode = KdNode(axis)
-    for triangle in triangles:
-        for x,y in triangle:
-            bbMin[0] = min(bbMin[0], x)
-            bbMin[1] = max(bbMin[1], y)
-            bbMax[0] = min(bbMax[0], x)
-            bbMax[1] = max(bbMax[1], y)
+def makeKDTree(triangles):
+    ts = [Triangle(x) for x in triangles]
+    bbMin = [float('inf'),float('inf')]
+    bbMax = [float('-inf'),float('-inf')]
+    for t in ts:
+        bbMin[0] = min(bbMin[0], t.bbMin[0])
+        bbMin[1] = min(bbMin[1], t.bbMin[1])
+        bbMax[0] = max(bbMax[0], t.bbMax[0])
+        bbMax[1] = max(bbMax[1], t.bbMax[1])
     middle = ((bbMin[0]+bbMax[0])/2,(bbMin[1]+bbMax[1])/2)
+    
 
+def _makeKDTree(triangles, bbMin, bbMax, axis):
+    pass
+    
 class KdNode:
-    def __init__(axis):
-        axis = axis
-        bbMin = []
-        bbMax = []
-        leaf = False
-        objects = []
+    def __init__(self,axis):
+        self.axis = axis
+        self.bbMin = []
+        self.bbMax = []
+        self.leaf = False
+        self.objects = []
+        self.left = None
+        self.right = None
+
+class Triangle:
+    def __init__(self,vs):
+        self.vs = vs
+        self.bbMin = [0,0]
+        self.bbMax = [0,0]
+        self.bbMin[0] = reduce(lambda x,y: min(x,y), [x[0] for x in vs])
+        self.bbMin[1] = reduce(lambda x,y: min(x,y), [x[1] for x in vs])
+        self.bbMax[0] = reduce(lambda x,y: max(x,y), [x[0] for x in vs])
+        self.bbMax[1] = reduce(lambda x,y: max(x,y), [x[1] for x in vs])
 
 def makeUnionFind(_set,N):
     uf = UnionFind(N)
@@ -174,6 +191,7 @@ def makeUnionFind(_set,N):
         uf.union(i,j)
     return uf
 
+makeKDTree([[(0,0),(1,0),(0,1)],[(0,0),(0.5,0),(0,0.5)]])
 #assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(0.5,0),(0,0.5)]))
 #assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(1,0),(0,1)]))
 #assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(1,0),(0,0.5)]))

@@ -31,7 +31,7 @@ msp2 = g.toMSPTree(hFn)
 edge_rep2 = msp2.makeEdgeRepresentation()
 
 world = TreeWorld(g, [edge_rep, edge_rep2])
-child1 = world.crossOver(edge_rep, edge_rep2)
+child1 = world.generateFittest()
 tn = parseEdgeArrayIntoTree(g.nodes, child1)
 print treeLength(msp,set()), "faces"
 #tn = parseArrayIntoTree(g.nodes, array_rep)
@@ -39,8 +39,8 @@ tn.unfold()
 v = tn.getAllChildVertices()
 v2d = tn.getAllChildVertices2D()
 
-#intersects = tn.checkIntersection() # return nodes thats intersect
-#print len(intersects), "faces that intersects"
+intersects = tn.checkIntersection() # return nodes thats intersect
+print len(intersects), "faces that intersects"
 #v_i = [ x.getTransformedVertices2D() for x in intersects ]
 #v = reduce(lambda x,y: x+y, v_i)
 
