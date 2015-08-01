@@ -1,4 +1,5 @@
 import numpy as np
+from unionfind import UnionFind
 from numpy import matrix, linalg, cross, dot, array
 from math import cos, sin, pi
 
@@ -148,6 +149,30 @@ def checkTriangleIntersections(t1, triangles):
     for t in triangles:
         if checkTriangleIntersection(t1,t): return True
     return False
+
+def makeKDTree(triangles, bbMin = [float('inf'),float('inf')], bbMax = [float('-inf'),float('-inf')], axis = 0):
+    kdnode = KdNode(axis)
+    for triangle in triangles:
+        for x,y in triangle:
+            bbMin[0] = min(bbMin[0], x)
+            bbMin[1] = max(bbMin[1], y)
+            bbMax[0] = min(bbMax[0], x)
+            bbMax[1] = max(bbMax[1], y)
+    middle = ((bbMin[0]+bbMax[0])/2,(bbMin[1]+bbMax[1])/2)
+
+class KdNode:
+    def __init__(axis):
+        axis = axis
+        bbMin = []
+        bbMax = []
+        leaf = False
+        objects = []
+
+def makeUnionFind(_set,N):
+    uf = UnionFind(N)
+    for i,j in _set:
+        uf.union(i,j)
+    return uf
 
 #assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(0.5,0),(0,0.5)]))
 #assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(1,0),(0,1)]))

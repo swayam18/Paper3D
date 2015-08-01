@@ -1,4 +1,6 @@
-from tree import parseArrayIntoTree
+from utilities import makeUnionFind
+from tree import parseArrayIntoTree, parseEdgeArrayIntoTree
+from unionfind import UnionFind
 import random
 
 class TreeWorld:
@@ -55,20 +57,28 @@ class TreeWorld:
     parent1 = self.arrays[i][:]
     parent2 = self.arrays[j][:]
 
-    (child1, child2) = self.crossOver(parent1,parent2)
+    (child1, child2) = (self.crossOver(parent1,parent2),self.crossOver(parent1,parent2))
     self.mutate(child1)
     self.mutate(child2)
-    return [child1, child2]
+    return child1, child2
 
   def crossOver(self,a, b):
-    i = min(a.index(-1), b.index(-1))
-    j = max(a.index(-1), b.index(-1))
+    set1 = set(a)
+    set2 = set(b)
+    child = set.intersection(set1,set2)
+    f = set.union(set1,set2) - child
+    uf = makeUnionFind(child, len(self.graph.nodes))
 
-    c = range(0,i)+range(j+1,len(a))
-    k = random.choice(c)
-    c = a[:k] + b[k:]
-    d = b[:k] + a[k:]
-    return c,d
+    edge_list = list(f)
+    random.shuffle(edge_list)
+    for edge in edge_list:
+        if not uf.connected(edge[0],edge[1]):
+            uf.union(edge[0],edge[1])
+            child.add(edge)
+        if len(child) == len(a): return list(child)
+
+    print "not fully connected"
+    return list(child)
 
   def mutate(self, a):
     roll = random.random()
@@ -92,14 +102,7 @@ class TreeWorld:
   # fitness is the number of non intersecting triangles
   def evaluate_array(self, array):
     # consistency check
-    for i,j in enumerate(array):
-      # if the triangles aren't neighbours, discard this mutant
-      if j != -1:
-        node_i = self.graph.nodes[i]
-        node_j = self.graph.nodes[j]
-        if self.graph.connected(node_i,node_j) == -1:
-          return 0
-    tn = parseArrayIntoTree(self.graph.nodes, array)
+    tn = parseEdgeArrayIntoTree(self.graph.nodes, array)
     tn.unfold()
     intersects = tn.checkIntersection()
     return len(array) - len(tn.checkIntersection())

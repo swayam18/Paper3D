@@ -25,17 +25,18 @@ def parseArrayIntoTree(nodes, array):
 def parseEdgeArrayIntoTree(nodes, array):
     root = TriangleNode(nodes[0]).makeRoot()
     stack = [root]
+    copy = array[:]
     while stack:
         parent = stack.pop(0)
         index = parent.node.index
-        for i,e in enumerate([x for x in array]):
+        for i,e in enumerate(copy[:]):
             child = None
             if e[0] == index:
                 child = TriangleNode(nodes[e[1]])
-                array.remove(e)
+                copy.remove(e)
             elif e[1] == index:
                 child = TriangleNode(nodes[e[0]])
-                array.remove(e)
+                copy.remove(e)
             if child == None: continue
             edges = []
             for v1 in parent.node.getVertices():
