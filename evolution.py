@@ -113,14 +113,32 @@ class TreeWorld:
     else:
       print "Mutating!"
       # remove a random edge that was in the cycle.
-      r = random.choice([i,j])
-
+      r = random.choice(self.dfs_search_for_path(list_of_edges,i,j))
       l = [edge for edge in list_of_edges if (r in edge)]
       rm = random.choice(l)
       list_of_edges.remove(rm)
       # insert in list_of_edges
       list_of_edges.append((i,j))
     return list_of_edges
+
+  def dfs_search_for_path(self,list_of_edges, i,j):
+    list_of_edges = list_of_edges[:]
+    return self._dfs_with_path(list_of_edges, i, j, [i])
+
+  def _dfs_with_path(self, list_of_edges, cur, goal, path):
+    children_edges = [edge for edge in list_of_edges if (cur in edge)]
+    if len(children_edges) == 0: return None
+    for child_edge in children_edges:
+      if goal in child_edge: 
+        return path + [goal]
+        break
+      else:
+        next = child_edge[1] if child_edge[0] == cur else child_edge[0]
+        list_of_edges.remove(child_edge)
+        res = self._dfs_with_path(list_of_edges, next, goal, path + [next])
+        if res != None:
+          return res
+
 
 
   def selectRandom(self,fitness):
