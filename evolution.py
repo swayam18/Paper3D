@@ -20,7 +20,7 @@ class TreeWorld:
     best = []
     bestFitness = 0
     if maxGenerations == None:
-      maxGenerations = 100
+      maxGenerations = 50
 
     if numPairs == None:
       numPairs = len(self.arrays)
@@ -63,11 +63,12 @@ class TreeWorld:
     return child1, child2
 
   def crossOver(self,a, b):
+    N = len(self.graph.nodes)
     set1 = set(a)
     set2 = set(b)
     child = set.intersection(set1,set2)
     f = set.union(set1,set2) - child
-    uf = makeUnionFind(child, len(self.graph.nodes))
+    uf = makeUnionFind(child, N)
 
     edge_list = list(f)
     random.shuffle(edge_list)
@@ -77,19 +78,50 @@ class TreeWorld:
             child.add(edge)
         if len(child) == len(a): return list(child)
 
-    print "not fully connected"
-    return list(child)
+    for i in xrange(N):
+        for j in xrange(N):
+            if i != j and not uf.connected(i,j):
+                uf.union(i,j)
+                child.add((i,j) if i < j else (j,i))
+    if len(child) != N-1:
+        print "not fully connected"
+        return list(random.choice((a,b)))
+    else:
+        return list(child)
 
-  def mutate(self, a):
+  def mutate(self, list_of_edges):
+    # see if we need to mutate
     roll = random.random()
     if roll > self.mutation_p:
-      return
-    i = random.randint(0,len(a)-1)
-    if a[i] == -1:
-      return
-    node = self.graph.nodes[i]
-    k = random.choice(list(node.children))
-    a[i] = k
+      return list_of_edges
+    i = random.randint(0,len(list_of_edges)-1)
+    if list_of_edges[i] == -1:
+      return list_of_edges
+    
+    # choose random node, and a random child
+    random_node = self.graph.nodes[i]
+    j = random.choice(list(random_node.children))
+  
+    # simple sort of (i,j)
+    if i > j:
+      temp = j
+      j = i
+      i = temp
+
+    if (i, j) in list_of_edges:
+      return list_of_edges
+    else:
+      print "Mutating!"
+      # remove a random edge that was in the cycle.
+      r = random.choice([i,j])
+
+      l = [edge for edge in list_of_edges if (r in edge)]
+      rm = random.choice(l)
+      list_of_edges.remove(rm)
+      # insert in list_of_edges
+      list_of_edges.append((i,j))
+    return list_of_edges
+
 
   def selectRandom(self,fitness):
     total = sum(fitness)
