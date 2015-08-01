@@ -70,16 +70,36 @@ class TreeWorld:
     d = b[:k] + a[k:]
     return c,d
 
-  def mutate(self, a):
+  def mutate(self, list_of_edges):
+    # see if we need to mutate
     roll = random.random()
     if roll > self.mutation_p:
       return
-    i = random.randint(0,len(a)-1)
-    if a[i] == -1:
+    i = random.randint(0,len(list_of_edges)-1)
+    if list_of_edges[i] == -1:
       return
-    node = self.graph.nodes[i]
-    k = random.choice(list(node.children))
-    a[i] = k
+    
+    # choose random node, and a random child
+    random_node = self.graph.nodes[i]
+    j = random.choice(list(random_node.children))
+  
+    # simple sort of (i,j)
+    if i > j:
+      temp = j
+      j = i
+      i = temp
+
+    if (i, j) in list_of_edges:
+      return
+    else:
+      # remove a random edge that was in the cycle.
+      r = random.choice([i,j])
+      l = [edge for edge in list_of_edges if r in edge]
+      rm = random.choice(l)
+      list_of_edges.remove(rm)
+
+      # insert in list_of_edges
+      list_of_edges.append((i,j))
 
   def selectRandom(self,fitness):
     total = sum(fitness)
