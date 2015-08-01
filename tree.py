@@ -22,6 +22,31 @@ def parseArrayIntoTree(nodes, array):
         stack.extend(children)
     return root
 
+def parseEdgeArrayIntoTree(nodes, array):
+    root = TriangleNode(nodes[0]).makeRoot()
+    stack = [root]
+    while stack:
+        parent = stack.pop(0)
+        index = parent.node.index
+        for i,e in enumerate([x for x in array]):
+            child = None
+            if e[0] == index:
+                child = TriangleNode(nodes[e[1]])
+                array.remove(e)
+            elif e[1] == index:
+                child = TriangleNode(nodes[e[0]])
+                array.remove(e)
+            if child == None: continue
+            edges = []
+            for v1 in parent.node.getVertices():
+                for v2 in child.node.getVertices():
+                    if vertex_close_enough(v1,v2):
+                        edges.append(v1)
+            assert(len(edges)==2)
+            parent.addChild(child,edges)
+            stack.append(child)
+    return root
+
 class TriangleNode:
     def __init__(self,face):
         #child is a tuple: (TriangleNode, edges(v1,v2))

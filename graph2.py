@@ -142,6 +142,19 @@ class TreeNode:
           stack.append(child)
     return array
 
+  def makeEdgeRepresentation(self):
+    out = [] 
+    stack = [self]
+    explored = set()
+    while stack:
+      node = stack.pop()
+      explored.add(node)
+      for child in node.children:
+        if child not in explored:
+          out.append((node.face.index,child.face.index) if node.face.index < child.face.index else (child.face.index, node.face.index)) 
+          stack.append(child)
+    return out
+
 def treeLength(msp,explored):
   explored.add(msp)
   u_children = 1

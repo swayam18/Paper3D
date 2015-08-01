@@ -14,11 +14,12 @@ import re
 import tree
 import utilities
 from numpy import array,cross
-from tree import TriangleNode, parseArrayIntoTree
+from tree import TriangleNode, parseArrayIntoTree, parseEdgeArrayIntoTree
 from stl_reader import Reader
 from graph2 import Graph,TreeNode,treeLength
 from utilities import getMatrixArbitraryAxis
 from dxf_writer import DXFWriter
+from evolution import TreeWorld
 
 # Assumes SolidPython is in site-packages or elsewhwere in sys.path
 from solid import *
