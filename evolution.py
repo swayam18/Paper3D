@@ -76,18 +76,15 @@ class TreeWorld:
         if not uf.connected(edge[0],edge[1]):
             uf.union(edge[0],edge[1])
             child.add(edge)
-        if len(child) == len(a): return list(child)
+        if len(child) == N-1: return list(child)
 
     for i in xrange(N):
         for j in xrange(N):
-            if i != j and not uf.connected(i,j):
+            if i != j and not uf.connected(i,j) and i in self.graph.nodes[j].children:
+                print "added new edge"
                 uf.union(i,j)
                 child.add((i,j) if i < j else (j,i))
-    if len(child) != N-1:
-        print "not fully connected"
-        return list(random.choice((a,b)))
-    else:
-        return list(child)
+    return list(child)
 
   def mutate(self, list_of_edges):
     # see if we need to mutate
@@ -138,8 +135,6 @@ class TreeWorld:
         res = self._dfs_with_path(list_of_edges, next, goal, path + [next])
         if res != None:
           return res
-
-
 
   def selectRandom(self,fitness):
     total = sum(fitness)
