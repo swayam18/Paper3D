@@ -27,7 +27,7 @@ class DXFWriter:
     all_edges = {k: self.d[k].node.edge_to_nodes for k in self.d }
     all_cut_edges = {k: self.d[k].node.edge_to_nodes for k in self.d }
     edge_numbering = {i: [None]*3 for i in range(len(self.d))}
-    print "all_edges", all_edges
+    # print "all_edges", all_edges
     
     discovered = set()
     for k in self.d:
@@ -51,8 +51,8 @@ class DXFWriter:
           discovered.add(edge_val)
           
 
-    print "all_fold_edges", all_fold_edges
-    print "all_cut_edges", all_cut_edges
+    # print "all_fold_edges", all_fold_edges
+    # print "all_cut_edges", all_cut_edges
     i = 0
     discovered = set()
     for j in all_cut_edges:
@@ -68,15 +68,21 @@ class DXFWriter:
 
 
     
-    print "edge_numbering", edge_numbering
-
-    # self.all_edges = all_edges
-    # self.fold_edges = all_fold_edges
-    # self.cut_edges = all_cut_edges
-    # self.edge_numbering = edge_numbering
-
-
+    # print "edge_numbering", edge_numbering
+    self.all_edges = all_edges
+    self.fold_edges = all_fold_edges
+    self.cut_edges = all_cut_edges
+    self.cut_edge_numbering = edge_numbering
+    return
+    
+    
+    
+  def generate_lines(self):
     drawn = set()
+    all_fold_edges = self.fold_edges
+    all_cut_edges = self.cut_edges
+    edge_numbering = self.cut_edge_numbering
+
     for k in self.d:
       v1, v2, v3 = self.d[k].transformed_vertices
       v1 = tuple(v1)
@@ -101,20 +107,13 @@ class DXFWriter:
           multiplier = 1.5
           pt = (midpoint[0] - n[0] * multiplier, midpoint[1] - n[1] * multiplier)
           self.drawing.add(dxf.text(edge_numbering[k][j], insert=pt))
-    
-    
-  def generate_lines(self):
-    for cut_edge in self.cut_edges:
-      self.drawing.add(dxf.line(cut_edge[0][:2], cut_edge[1][:2], color=self.cutting_color))
-    for fold_edge in self.fold_edges:
-      self.drawing.add(dxf.line(fold_edge[0][:2], fold_edge[1][:2], color=self.folding_color1))
 
   def generate_edge_numbering(self):
     pass
 
   def generate_file(self):
     self.generate_from_vertices2()
-    # self.generate_lines()
+    self.generate_lines()
     self.drawing.save()
 
 

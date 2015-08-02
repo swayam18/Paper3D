@@ -38,12 +38,7 @@ print treeLength(msp,set()), "faces"
 tn.unfold()
 v = tn.getAllChildVertices()
 v2d = tn.getAllChildVertices2D()
-edges = tn.getAllEdges()
-print edges
-indices = tn.getAllNodeIndices()
-print indices
 d = tn.convertToDict()
-print d
 
 tn.getAllChildTriangles()
 kdtree = utilities.makeKDTree(tn.getAllChildTriangles())
