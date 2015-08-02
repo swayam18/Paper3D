@@ -38,6 +38,8 @@ print treeLength(msp,set()), "faces"
 tn.unfold()
 v = tn.getAllChildVertices()
 v2d = tn.getAllChildVertices2D()
+tn.getAllChildTriangles()
+kdtree = utilities.makeKDTree(tn.getAllChildTriangles())
 
 intersects = tn.checkIntersection() # return nodes thats intersect
 print len(intersects), "faces that intersects"

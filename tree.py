@@ -93,11 +93,12 @@ class TriangleNode:
         v_i = self._getAllFaceVertices2D()
         faceVertices = [ x[0] for x in v_i]
         faceIndex = [ x[1] for x in v_i]
-        print self._checkIntersection(faceVertices,faceIndex)
-        return self._checkIntersection(faceVertices,faceIndex)
+        kdtree = utilities.makeKDTree(faceVertices)
+        return self._checkIntersection(faceVertices,faceIndex,kdtree)
 
-    def _checkIntersection(self, triangles, index):
-        t = utilities.checkTriangleIntersections(self.getTransformedVertices2D(), triangles)
+    def _checkIntersection(self, triangles, index, kdtree):
+        #t = utilities.checkTriangleIntersections(self.getTransformedVertices2D(), triangles)
+        t = kdtree.intersection(utilities.Triangle(self.getTransformedVertices2D(),self.node.index))
         if t!=False:
             out = [(self.node.index,index[t])]
         else: out = []
@@ -105,7 +106,7 @@ class TriangleNode:
             return out
         else:
             for child, edge in self.children:
-                out.extend(child._checkIntersection(triangles, index))
+                out.extend(child._checkIntersection(triangles, index, kdtree))
             return out
 
     def _getAllChildVertices(self):

@@ -20,7 +20,7 @@ class TreeWorld:
     best = []
     bestFitness = 0
     if maxGenerations == None:
-      maxGenerations = 50
+      maxGenerations = 100
 
     if numPairs == None:
       numPairs = len(self.arrays)
@@ -76,7 +76,9 @@ class TreeWorld:
         if not uf.connected(edge[0],edge[1]):
             uf.union(edge[0],edge[1])
             child.add(edge)
-        if len(child) == N-1: return list(child)
+        if len(child) == N-1: 
+            assert(len(parseEdgeArrayIntoTree(self.graph.nodes, list(child).getAllChildTriangles())==N))
+            return list(child)
 
     for i in xrange(N):
         for j in xrange(N):
