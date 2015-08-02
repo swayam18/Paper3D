@@ -46,7 +46,6 @@ class Graph:
       node_u.children.append(node_v)
       node_v.children.append(node_u)
 
-
     #root = treeNodes[choice(choice(edges))]
     root = treeNodes[edges[0][0]]
     return root
@@ -78,7 +77,7 @@ class Graph:
 
   def generate_edges(self):
     for i in xrange(len(self.nodes)):
-      for j in xrange(i,len(self.nodes)):
+      for j in xrange(len(self.nodes)):
         if i == j: continue
         edge_id = self.connected(self.nodes[i], self.nodes[j])
         if edge_id != -1:
@@ -86,6 +85,7 @@ class Graph:
           self.nodes[j].children.add(i)
           self.edges.append((i,j))
           self.edge_ids.append(edge_id)
+          self.nodes[i].edge_to_nodes[edge_id] = (i,j) if i < j else (j,i)    
 
   def connected(self, node1, node2):
     for i, node1edge in enumerate(node1.edges):
@@ -105,6 +105,7 @@ class Node:
 
     self.edges = [(v1, v2), (v2, v3), (v3, v1)]
     self.children = set()
+    self.edge_to_nodes = [None] * 3
     self.edge_lengths = map(linalg.norm, self.edges)
 
   def __repr__(self):

@@ -3,6 +3,7 @@ import numpy as np
 import utilities
 from math import cos, sin, pi
 from utilities import getMatrixArbitraryAxis, angleBetween, getTranslationMatrix, getNormal, unitVector, getUnfoldingMatrix, flatternMatrixArray, vertex_close_enough
+import operator
 
 def parseArrayIntoTree(nodes, array):
     root = TriangleNode(nodes[array.index(-1)]).makeRoot()
@@ -88,6 +89,43 @@ class TriangleNode:
 
     def getTransformedVertices2D(self):
         return [[ round(i,5) for i in x][:2] for x in self.transformed_vertices ]
+
+    def getAllNodeIndices(self):
+        return self._getAllNodeIndices()
+
+    def _getAllNodeIndices(self):
+        indices = [self.node.index]
+        if len(self.children) == 0:
+            return indices
+        for child,edge in self.children:
+            indices.extend(child._getAllNodeIndices())
+        return indices
+
+    def getAllEdges(self):
+        return self._getAllEdges()
+
+    def _getAllEdges(self):
+        edges = [self.node.edge_to_nodes]
+        if len(self.children) == 0:
+            return edges
+        for child,edge in self.children:
+            edges.extend(child._getAllEdges())
+        return edges
+
+    def convertToDict(self):
+        d = self._convertToDict()
+        
+        return d
+
+    def _convertToDict(self):
+        d = {}
+        d[self.node.index] = self
+        if len(self.children) == 0:
+            return d
+        for child,edge in self.children:
+            d.update(child._convertToDict())
+        return d
+
 
     def checkIntersection(self):
         v_i = self._getAllFaceVertices2D()

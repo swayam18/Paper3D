@@ -1,7 +1,7 @@
 import numpy as np
 from unionfind import UnionFind
 from numpy import matrix, linalg, cross, dot, array
-from math import cos, sin, pi
+from math import *
 
 eps = 0.0001
 def close_enough(edge1, edge2):
@@ -92,6 +92,13 @@ def getNormal(vertices):
     edge2 = vertices[0] - vertices[2]
     v = cross(edge1[:3], edge2[:3])
     return np.append(unitVector(v),0)
+
+
+def getNormalBetween2DVertices(v1,v2):
+    n = ((v2[1] - v1[1]), -(v2[0] - v1[0]))
+    magnitude = sqrt(n[0]**2 + n[1]**2)
+    n = ((v2[1] - v1[1])/magnitude, - (v2[0] - v1[0])/magnitude)
+    return n
 
 def unitVector(vector):
     norm = np.linalg.norm(vector)

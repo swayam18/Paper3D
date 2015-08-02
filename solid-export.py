@@ -38,6 +38,13 @@ print treeLength(msp,set()), "faces"
 tn.unfold()
 v = tn.getAllChildVertices()
 v2d = tn.getAllChildVertices2D()
+edges = tn.getAllEdges()
+print edges
+indices = tn.getAllNodeIndices()
+print indices
+d = tn.convertToDict()
+print d
+
 tn.getAllChildTriangles()
 kdtree = utilities.makeKDTree(tn.getAllChildTriangles())
 
@@ -72,5 +79,5 @@ if __name__ == '__main__':
     a = assembly()
     #a = intersecting()
     scad_render_to_file(a,'unfold.scad', file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)
-    d = DXFWriter(v2d) 
+    d = DXFWriter(d) 
     d.generate_file()
