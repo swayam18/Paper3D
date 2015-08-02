@@ -20,7 +20,7 @@ class TreeWorld:
     best = []
     bestFitness = 0
     if maxGenerations == None:
-      maxGenerations = 100
+      maxGenerations = 10
 
     if numPairs == None:
       numPairs = len(self.arrays)
@@ -118,15 +118,14 @@ class TreeWorld:
       list_of_edges.append((i,j))
     return list_of_edges
 
-  def paths_intersection(self):
-    # replace default with best array...
-    array = self.arrays[0]
+  def paths_intersection(self,array):
     tn = parseEdgeArrayIntoTree(self.graph.nodes, array)
     tn.unfold()
     intersects = tn.checkIntersection()
     p = []
     for i,j in intersects:
-      p.append(tuple(self.graph.findPath(i,j)))
+      r = self.dfs_search_for_path(array,i,j)
+      p.append(tuple(r))
     return p
 
   def dfs_search_for_path(self,list_of_edges, i,j):
@@ -137,8 +136,8 @@ class TreeWorld:
     children_edges = [edge for edge in list_of_edges if (cur in edge)]
     if len(children_edges) == 0: return None
     for child_edge in children_edges:
-      if goal in child_edge: 
-        return path + [(cur,goal) if cur < goal else (goal,cur)] 
+      if goal in child_edge:
+        return path + [(cur,goal) if cur < goal else (goal,cur)]
         break
       else:
         next = child_edge[1] if child_edge[0] == cur else child_edge[0]
