@@ -20,7 +20,7 @@ class TreeWorld:
     best = []
     bestFitness = 0
     if maxGenerations == None:
-      maxGenerations = 10
+      maxGenerations = 100
 
     if numPairs == None:
       numPairs = len(self.arrays)

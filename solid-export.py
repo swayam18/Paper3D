@@ -21,7 +21,10 @@ from solid.utils import *
 SEGMENTS = 48
 
 triangles = Reader.read("stl/rhino-quarter.stl")
+# triangles = Reader.read("stl/icosahedron.stl")
 g = Graph(triangles)
+n = len(g.nodes)
+print "There are a total of ", n, " nodes"
 hFn = lambda e: g.defaultHeuristic(e)
 msp = g.toMSPTree(hFn)
 edge_rep = msp.makeEdgeRepresentation()
@@ -39,7 +42,7 @@ print treeLength(msp,set()), "faces"
 tn.unfold()
 v = tn.getAllChildVertices()
 v2d = tn.getAllChildVertices2D()
-d = tn.convertToDict()
+
 
 tn.getAllChildTriangles()
 kdtree = utilities.makeKDTree(tn.getAllChildTriangles())
@@ -50,6 +53,10 @@ paths = world.paths_intersection(child1)
 cutEdges = g.cutEdges(paths)
 print "Edges to cut:", cutEdges
 tns = cutTreeIntoPatches(tn,cutEdges)
+ds = [tn.convertToDict() for tn in tns]
+print "No of Patches:", len(ds)
+
+
 
 #v_i = [ x.getTransformedVertices2D() for x in intersects ]
 #v = reduce(lambda x,y: x+y, v_i)
@@ -77,12 +84,13 @@ def intersecting():
     return a
 
 if __name__ == '__main__':
-  for i,tn in enumerate(tns):
-    v = tn.getAllChildVertices()
-    a = assembly(v)
-    scad_render_to_file(a,'unfold{0}.scad'.format(i), file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)
+    for i,tn in enumerate(tns):
+        v = tn.getAllChildVertices()
+        a = assembly(v)
+        scad_render_to_file(a,'unfold{0}.scad'.format(i), file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)
 
-    #a = intersecting()
-    scad_render_to_file(a,'unfold.scad', file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)
-    d = DXFWriter(d) 
-    d.generate_file()
+        #a = intersecting()
+        scad_render_to_file(a,'unfold.scad', file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)
+    
+    d_writer = DXFWriter(n, ds, "multiple.dxf")
+    d_writer.generate_file()
