@@ -118,6 +118,17 @@ class TreeWorld:
       list_of_edges.append((i,j))
     return list_of_edges
 
+  def paths_intersection(self):
+    # replace default with best array...
+    array = self.arrays[0]
+    tn = parseEdgeArrayIntoTree(self.graph.nodes, array)
+    tn.unfold()
+    intersects = tn.checkIntersection()
+    p = []
+    for i,j in intersects:
+      p.append(tuple(self.graph.findPath(i,j)))
+    return p
+
   def dfs_search_for_path(self,list_of_edges, i,j):
     list_of_edges = list_of_edges[:]
     return self._dfs_with_path(list_of_edges, i, j, [])
