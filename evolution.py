@@ -7,7 +7,7 @@ class TreeWorld:
   def __init__(self, graph, arrays):
     self.graph = graph
     self.arrays = arrays
-    self.mutation_p = 0.1
+    self.mutation_p = 1.0
 
   def evaluate(self):
     fitness = [0] * len(self.arrays)
@@ -77,7 +77,6 @@ class TreeWorld:
             uf.union(edge[0],edge[1])
             child.add(edge)
         if len(child) == N-1: 
-            assert(len(parseEdgeArrayIntoTree(self.graph.nodes, list(child)).getAllChildTriangles())==N)
             return list(child)
 
     for i in xrange(N):
@@ -112,9 +111,8 @@ class TreeWorld:
     else:
       print "Mutating!"
       # remove a random edge that was in the cycle.
-      r = random.choice(self.dfs_search_for_path(list_of_edges,i,j))
-      l = [edge for edge in list_of_edges if (r in edge)]
-      rm = random.choice(l)
+      r = self.dfs_search_for_path(list_of_edges,i,j)
+      rm = random.choice(r)
       list_of_edges.remove(rm)
       # insert in list_of_edges
       list_of_edges.append((i,j))
@@ -122,19 +120,19 @@ class TreeWorld:
 
   def dfs_search_for_path(self,list_of_edges, i,j):
     list_of_edges = list_of_edges[:]
-    return self._dfs_with_path(list_of_edges, i, j, [i])
+    return self._dfs_with_path(list_of_edges, i, j, [])
 
   def _dfs_with_path(self, list_of_edges, cur, goal, path):
     children_edges = [edge for edge in list_of_edges if (cur in edge)]
     if len(children_edges) == 0: return None
     for child_edge in children_edges:
       if goal in child_edge: 
-        return path + [goal]
+        return path + [(cur,goal) if cur < goal else (goal,cur)] 
         break
       else:
         next = child_edge[1] if child_edge[0] == cur else child_edge[0]
         list_of_edges.remove(child_edge)
-        res = self._dfs_with_path(list_of_edges, next, goal, path + [next])
+        res = self._dfs_with_path(list_of_edges, next, goal, path + [(cur,next) if cur < next else (next,cur)])
         if res != None:
           return res
 

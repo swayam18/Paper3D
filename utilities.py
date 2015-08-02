@@ -168,7 +168,7 @@ def _makeKDTree(triangles, bbMin, bbMax, axis):
     root.bbMin = bbMin
     root.bbMax = bbMax
     root.objects = triangles
-    if len(triangles) < 3:
+    if len(triangles) < 4:
         root.leaf = True
         return root
     middle = (bbMin[axis] + bbMax[axis]) / 2
