@@ -77,7 +77,7 @@ class TreeWorld:
             uf.union(edge[0],edge[1])
             child.add(edge)
         if len(child) == N-1: 
-            assert(len(parseEdgeArrayIntoTree(self.graph.nodes, list(child).getAllChildTriangles())==N))
+            assert(len(parseEdgeArrayIntoTree(self.graph.nodes, list(child)).getAllChildTriangles())==N)
             return list(child)
 
     for i in xrange(N):
