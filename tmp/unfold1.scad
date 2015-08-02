@@ -1,3 +1,10 @@
+$fn = 48;
+
+polyhedron(points = [[-209.6627341125, -403.4339045920, 95.2417408827], [-178.4248530781, -386.0241189832, 95.2417407217], [-232.2128535210, -347.8298231951, 95.2417409080], [-172.3742590702, -415.3313283596, 95.2417421101], [-178.4248530562, -386.0241190225, 95.2417407585], [-209.6627341344, -403.4339045527, 95.2417408459], [-178.4248529701, -386.0241190047, 95.2417414223], [-172.3742591563, -415.3313283774, 95.2417414463], [-115.3795959416, -364.7253253037, 95.2417414257], [-268.9695701568, -374.6395431426, 95.2417406705], [-209.6627339464, -403.4339045246, 95.2417405497], [-232.2128536870, -347.8298232624, 95.2417412409]], triangles = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]]);
+/***********************************************
+******      SolidPython code:      *************
+************************************************
+ 
 #! /usr/bin/env python
 # -*- coding: UTF-8 -*-
 from __future__ import division
@@ -39,8 +46,6 @@ print treeLength(msp,set()), "faces"
 tn.unfold()
 v = tn.getAllChildVertices()
 v2d = tn.getAllChildVertices2D()
-d = tn.convertToDict()
-
 tn.getAllChildTriangles()
 kdtree = utilities.makeKDTree(tn.getAllChildTriangles())
 
@@ -83,6 +88,10 @@ if __name__ == '__main__':
     scad_render_to_file(a,'unfold{0}.scad'.format(i), file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)
 
     #a = intersecting()
-    scad_render_to_file(a,'unfold.scad', file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)
-    d = DXFWriter(d) 
-    d.generate_file()
+    #scad_render_to_file(a,'unfold.scad', file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)
+    #d = DXFWriter(v2d) 
+    #d.generate_file()
+ 
+ 
+***********************************************/
+                            

@@ -65,7 +65,7 @@ class Graph:
     return path
 
   def bfs(self, goal_id, frontier,explored):
-    node_id = frontier.pop()
+    node_id,frontier = frontier[0], frontier[1:]
     parent_id = explored[node_id]
     if node_id == goal_id:
       return explored

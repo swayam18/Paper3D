@@ -49,6 +49,30 @@ def parseEdgeArrayIntoTree(nodes, array):
             stack.append(child)
     return root
 
+def cutTreeIntoPatches(root,cutEdges):
+  cuts = []
+  roots = [root]
+  stack = [root]
+  while stack:
+    parent = stack.pop(0)
+    index = parent.node.index
+    children = parent.children
+    edges = [(index,child[0].node.index) for child in children]
+    for i,edge in enumerate(edges):
+      if edge not in cutEdges and (edge[1],edge[0]) not in cutEdges:
+        continue
+      cuts.append((parent,children[i]))
+    for child in children:
+      stack.append(child[0])
+  for parent, child in cuts:
+    roots.append(child[0])
+    parent.children.remove(child)
+
+  for rt in roots:
+    rt.makeRoot()
+  return roots
+
+
 class TriangleNode:
     def __init__(self,face):
         #child is a tuple: (TriangleNode, edges(v1,v2))
