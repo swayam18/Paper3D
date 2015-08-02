@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import linalg
 from numpy import argsort
+from numpy import argmin
 from unionfind import UnionFind
 from random import choice
 from utilities import close_enough
@@ -31,7 +32,7 @@ class Graph:
 
     if self.l_min == self.l_max: self.l_max += 0.0001
     self.generate_edges()
-    self.defaultHeuristic = lambda edge_length: -(self.l_max - edge_length)/(self.l_max - self.l_min)
+    self.defaultHeuristic = lambda edge_length: (self.l_max - edge_length)/(self.l_max - self.l_min)
 
   def toMSPTree(self, heuristicFn = None):
     if heuristicFn == None:
@@ -50,6 +51,32 @@ class Graph:
     root = treeNodes[edges[0][0]]
     return root
 
+  def findPath(self,start_id, end_id):
+    frontier = [start_id]
+    explored = {}
+    explored[start_id] = None
+    exp = self.bfs(end_id, frontier, explored)
+    path = []
+    node_id = end_id
+    while exp[node_id] != None:
+      path.append((exp[node_id], node_id))
+      node_id = exp[node_id]
+    path.reverse()
+    return path
+
+  def bfs(self, goal_id, frontier,explored):
+    node_id = frontier.pop()
+    parent_id = explored[node_id]
+    if node_id == goal_id:
+      return explored
+    else:
+      node = self.nodes[node_id]
+      for child_id in node.children:
+        if not child_id in explored:
+          explored[child_id] = node_id
+          frontier.append(child_id)
+      return self.bfs(goal_id, frontier, explored)
+
   def mspEdges(self, heuristicFn):
     A = []
     N = len(self.nodes)
@@ -63,6 +90,43 @@ class Graph:
         A.append((u,v))
         uf.union(u,v)
     return A
+
+  def cutEdges(self, paths, heuristicFn=None):
+    if heuristicFn == None:
+      heuristicFn = self.defaultHeuristic
+    weights = self.generate_weights(heuristicFn)
+
+    S = set()
+    P = set()
+    for path in paths:
+      P.add(path)
+    C = set()
+    edges = {}
+
+    for path in paths:
+      for e in path:
+        if e not in edges:
+          edges[e] = set()
+        edges[e].add(path)
+
+    while C != P:
+      e_min = None
+      e_min_cost = float("inf")
+      e_min_paths = set()
+      for e in edges.keys():
+        i = self.edges.index((min(e),max(e)))
+        weight = weights[i]
+        l_paths = edges[e] - C
+        size = len(l_paths) + 0.000001
+        cost = 1.0/size
+
+        if cost < e_min_cost:
+          e_min_cost = cost
+          e_min = e
+          e_min_paths = l_paths
+      S.add(e_min)
+      C = C.union(e_min_paths)
+    return S
 
   def getMaxMinLenghts(self):
     return (self.l_min, self.l_max)

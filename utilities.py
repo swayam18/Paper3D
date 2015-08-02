@@ -150,7 +150,7 @@ def checkTriangleIntersection(t1,t2):
         if checkPointInTriangle(v,t1):
             return True
     return False
-    
+
 
 def checkTriangleIntersections(t1, triangles):
     for i,t in enumerate(triangles):
