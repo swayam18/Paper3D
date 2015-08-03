@@ -19,8 +19,8 @@ from solid import *
 from solid.utils import *
 
 SEGMENTS = 48
-
-triangles = Reader.read("stl/rhino-quarter.stl")
+filename = "cylinder.stl"
+triangles = Reader.read("stl/" + filename)
 # triangles = Reader.read("stl/icosahedron.stl")
 g = Graph(triangles)
 n = len(g.nodes)
@@ -92,5 +92,5 @@ if __name__ == '__main__':
         #a = intersecting()
         scad_render_to_file(a,'unfold.scad', file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)
     
-    d_writer = DXFWriter(n, ds, "multiple.dxf")
+    d_writer = DXFWriter(n, ds, filename)
     d_writer.generate_file()
