@@ -19,7 +19,7 @@ from solid import *
 from solid.utils import *
 
 SEGMENTS = 48
-filename = "cylinder.stl"
+filename = "kitten-122.stl"
 triangles = Reader.read("stl/" + filename)
 # triangles = Reader.read("stl/icosahedron.stl")
 g = Graph(triangles)
