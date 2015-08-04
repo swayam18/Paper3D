@@ -82,7 +82,7 @@ class DXFWriter:
       cut_edges = all_cut_edges[k]
       fold_edges = all_fold_edges[k]
       
-      for j, edge in enumerate([(v1,v2), (v2,v3), (v3,v1)]):
+      for j, edge in enumerate([(v1,v2), (v2,v3), (v3,v1)]) and edge not in drawn:
         if cut_edges[j] != None and edge not in drawn:  
           self.drawings[i].add(dxf.line(edge[0][:2], edge[1][:2], color=self.cutting_color))
           drawn.add(edge)
