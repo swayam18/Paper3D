@@ -83,13 +83,14 @@ class DXFWriter:
       fold_edges = all_fold_edges[k]
       
       for j, edge in enumerate([(v1,v2), (v2,v3), (v3,v1)]):
-        if cut_edges[j] != None and edge not in drawn:  
-          self.drawings[i].add(dxf.line(edge[0][:2], edge[1][:2], color=self.cutting_color))
-          drawn.add(edge)
+        if edge not in drawn:
+          if cut_edges[j] != None and edge not in drawn:  
+            self.drawings[i].add(dxf.line(edge[0][:2], edge[1][:2], color=self.cutting_color))
+            drawn.add(edge)
 
-        elif fold_edges[j] != None and edge not in drawn:
-          self.drawings[i].add(dxf.line(edge[0][:2], edge[1][:2], color=self.folding_color1))
-          drawn.add(edge)
+          elif fold_edges[j] != None and edge not in drawn:
+            self.drawings[i].add(dxf.line(edge[0][:2], edge[1][:2], color=self.folding_color1))
+            drawn.add(edge)
 
   def draw_numbers(self, i):
     drawn = set()
@@ -109,9 +110,9 @@ class DXFWriter:
         if edge_numbering[k][j] != None:
           midpoint = ( (edge[0][0] + edge[1][0])/2 , (edge[0][1] + edge[1][1])/2 )
           n = getNormalBetween2DVertices(edge[0],edge[1])
-          multiplier = 1.5
+          multiplier = 0.4
           pt = (midpoint[0] - n[0] * multiplier, midpoint[1] - n[1] * multiplier)
-          self.drawings[i].add(dxf.text(edge_numbering[k][j], insert=pt))
+          self.drawings[i].add(dxf.text(edge_numbering[k][j], insert=pt, height=0.2, color=self.folding_color1))
 
   def generate_edge_numbering(self):
     edge_numbering = {i: [None]*3 for i in self.combined_d}
