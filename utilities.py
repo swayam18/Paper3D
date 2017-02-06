@@ -43,7 +43,6 @@ def memoize(f):
 def flatternMatrixArray(array):
     return reduce(lambda m1,m2: matrixMultiply(m1,m2), array)
 
-@memoize
 def matrixMultiply(m1,m2):
     return m1*m2
 

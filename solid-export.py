@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: UTF-8 -*-
 from __future__ import division
 import os
 import sys
@@ -34,7 +33,7 @@ msp2 = g.toMSPTree(hFn)
 edge_rep2 = msp2.makeEdgeRepresentation()
 
 world = TreeWorld(g, [edge_rep, edge_rep2])
-child1 = world.generateFittest()
+child1 = world.generateFittest(maxGenerations=100)
 print child1
 tn = parseEdgeArrayIntoTree(g.nodes, child1)
 print treeLength(msp,set()), "faces"
@@ -57,7 +56,6 @@ ds = [tn.convertToDict() for tn in tns]
 print "No of Patches:", len(ds)
 
 
-
 #v_i = [ x.getTransformedVertices2D() for x in intersects ]
 #v = reduce(lambda x,y: x+y, v_i)
 
@@ -74,7 +72,7 @@ print "No of Patches:", len(ds)
 def assembly(v):
     a = polyhedron(
             points=v,
-            triangles=[[x for x in range(y,y+3)] for y in range(0,len(v),3)])
+            faces=[[x for x in range(y,y+3)] for y in range(0,len(v),3)])
     return a
 
 def intersecting():
