@@ -12,14 +12,15 @@ from graph2 import Graph,TreeNode,treeLength
 from utilities import getMatrixArbitraryAxis
 from dxf_writer import DXFWriter
 from evolution import TreeWorld
+from obj_reader import ObjReader
 
 # Assumes SolidPython is in site-packages or elsewhwere in sys.path
 from solid import *
 from solid.utils import *
 
 SEGMENTS = 48
-filename = "uv_sphere.stl"
-triangles = Reader.read("stl/" + filename)
+filename = "uv_sphere.obj"
+triangles = ObjReader().read("obj/sphere/" + filename)
 print triangles[0]
 # triangles = Reader.read("stl/icosahedron.stl")
 g = Graph(triangles)
