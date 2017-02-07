@@ -89,9 +89,8 @@ def columnCross(v1,v2):
 def getNormal(vertices):
     edge1 = vertices[0] - vertices[1]
     edge2 = vertices[0] - vertices[2]
-    v = cross(edge1[:3], edge2[:3])
-    return np.append(unitVector(v),0)
-
+    v = cross(edge1, edge2)
+    return v.astype(np.float32)
 
 def getNormalBetween2DVertices(v1,v2):
     n = ((v2[1] - v1[1]), -(v2[0] - v1[0]))
@@ -247,6 +246,9 @@ def makeUnionFind(_set,N):
     for i,j in _set:
         uf.union(i,j)
     return uf
+
+def toNpArray(array):
+    return np.array(array, dtype=np.float32)
 
 #assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(0.5,0),(0,0.5)]))
 #assert(checkTriangleIntersection([(0,0),(1,0),(0,1)],[(0,0),(1,0),(0,1)]))

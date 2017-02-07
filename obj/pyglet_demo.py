@@ -11,7 +11,7 @@ import pywavefront
 
 rotation = 0
 
-meshes = pywavefront.Wavefront('LibertyStatue/LibertStatue.obj')
+meshes = pywavefront.Wavefront('sphere/uv_sphere.obj')
 
 window = pyglet.window.Window()
 

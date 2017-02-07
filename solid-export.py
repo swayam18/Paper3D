@@ -18,8 +18,9 @@ from solid import *
 from solid.utils import *
 
 SEGMENTS = 48
-filename = "kitten-122.stl"
+filename = "uv_sphere.stl"
 triangles = Reader.read("stl/" + filename)
+print triangles[0]
 # triangles = Reader.read("stl/icosahedron.stl")
 g = Graph(triangles)
 n = len(g.nodes)
@@ -33,7 +34,7 @@ msp2 = g.toMSPTree(hFn)
 edge_rep2 = msp2.makeEdgeRepresentation()
 
 world = TreeWorld(g, [edge_rep, edge_rep2])
-child1 = world.generateFittest(maxGenerations=100)
+child1 = world.generateFittest(maxGenerations=1)
 print child1
 tn = parseEdgeArrayIntoTree(g.nodes, child1)
 print treeLength(msp,set()), "faces"
