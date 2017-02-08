@@ -2,7 +2,7 @@ from numpy import matrix, linalg, cross, dot, array
 import numpy as np
 import utilities
 from math import cos, sin, pi
-from utilities import getMatrixArbitraryAxis, angleBetween, getTranslationMatrix, getNormal, unitVector, getUnfoldingMatrix, flatternMatrixArray, vertex_close_enough
+from utilities import getMatrixArbitraryAxis, angleBetween, getTranslationMatrix, getNormal, unitVector, toNpArray, getUnfoldingMatrix, flatternMatrixArray, vertex_close_enough
 import operator
 
 def parseArrayIntoTree(nodes, array):
@@ -110,6 +110,24 @@ class TriangleNode:
             self.transformed_vertices[i] = array((flatternMatrixArray(self.matrix) * matrix(x).T).T)[0]
         for child, edge in self.children:
             child.unfold()
+
+    def generateMesh(self):
+        face_vertex = self.transformed_vertices
+        self.node.of.v1.v = toNpArray(face_vertex[0][:3])
+        self.node.of.v2.v = toNpArray(face_vertex[1][:3])
+        self.node.of.v3.v = toNpArray(face_vertex[2][:3])
+
+        self.node.of.v1.n = toNpArray([0,0,1])
+        self.node.of.v2.n = toNpArray([0,0,1])
+        self.node.of.v3.n = toNpArray([0,0,1])
+
+        self.node.of.n = np.array([0,0,1], dtype=np.float32)
+
+        if len(self.children) == 0:
+            return
+        else:
+            for child,edges in self.children:
+                child.generateMesh()
 
     def getTransformedVertices2D(self):
         return [[ round(i,5) for i in x][:2] for x in self.transformed_vertices ]

@@ -48,9 +48,12 @@ print child1
 tn = parseEdgeArrayIntoTree(g.nodes, child1)
 print treeLength(msp,set()), "faces"
 #tn = parseArrayIntoTree(g.nodes, array_rep)
+print tn.node
 tn.unfold()
 v = tn.getAllChildVertices()
 v2d = tn.getAllChildVertices2D()
+
+print tn.node
 
 
 tn.getAllChildTriangles()
