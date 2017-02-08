@@ -24,7 +24,7 @@ mesh = ObjReader().read("obj/sphere/" + filename)
 triangles = mesh.triangles()
 print triangles[0]
 # triangles = Reader.read("stl/icosahedron.stl")
-g = Graph(triangles)
+g = Graph(triangles, mesh) # HORRIBLE... REFACTOR
 n = len(g.nodes)
 print "There are a total of ", n, " nodes"
 hFn = lambda e: g.defaultHeuristic(e)
@@ -41,11 +41,9 @@ print child1
 tn = parseEdgeArrayIntoTree(g.nodes, child1)
 print treeLength(msp,set()), "faces"
 #tn = parseArrayIntoTree(g.nodes, array_rep)
-print tn.node
 tn.unfold()
 v = tn.getAllChildVertices()
 v2d = tn.getAllChildVertices2D()
-
 
 tn.getAllChildTriangles()
 kdtree = utilities.makeKDTree(tn.getAllChildTriangles())
@@ -58,56 +56,6 @@ print "Edges to cut:", cutEdges
 tns = cutTreeIntoPatches(tn,cutEdges)
 ds = [tn.convertToDict() for tn in tns]
 print "No of Patches:", len(ds)
-
-import sys
-sys.path.append('..')
-import ctypes
-
-import pyglet
-from pyglet.gl import *
-
-import pywavefront
-
-rotation = 0
-
-meshes = pywavefront.Wavefront('sphere/uv_sphere.obj')
-
-window = pyglet.window.Window()
-
-lightfv = ctypes.c_float * 4
-
-@window.event
-def on_resize(width, height):
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(60., float(width)/height, 1., 100.)
-    glMatrixMode(GL_MODELVIEW)
-    return True
-
-@window.event
-def on_draw():
-    window.clear()
-    glLoadIdentity()
-
-    glLightfv(GL_LIGHT0, GL_POSITION, lightfv(-1.0, 1.0, 1.0, 0.0))
-    glEnable(GL_LIGHT0)
-
-    glTranslated(0, 0, -3)
-    glRotatef(rotation, 0, 1, 0)
-    glRotatef(-25, 1, 0, 0)
-    glRotatef(45, 0, 0, 1)
-    glEnable(GL_LIGHTING)
-
-    meshes.draw()
-
-def update(dt):
-    global rotation
-    rotation += 90*dt
-    if rotation > 720: rotation = 0
-
-pyglet.clock.schedule(update)
-
-pyglet.app.run()
 
 
 #v_i = [ x.getTransformedVertices2D() for x in intersects ]
