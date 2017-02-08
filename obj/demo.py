@@ -1,6 +1,6 @@
 import pywavefront
 
-wavefront = pywavefront.Wavefront('sphere/uv_sphere.obj')
+wavefront = pywavefront.Wavefront('earth/earth.obj')
 parsedObject = pywavefront.ObjParser(wavefront, wavefront.file_name)
 
 print 'MESH>>>>'

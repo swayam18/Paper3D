@@ -19,8 +19,8 @@ from solid import *
 from solid.utils import *
 
 SEGMENTS = 48
-filename = "uv_sphere.obj"
-mesh = ObjReader().read("obj/sphere/" + filename)
+filename = "earth.obj"
+mesh = ObjReader().read("obj/earth/" + filename)
 triangles = mesh.triangles()
 print triangles[0]
 # triangles = Reader.read("stl/icosahedron.stl")
