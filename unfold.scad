@@ -27,7 +27,8 @@ from solid.utils import *
 
 SEGMENTS = 48
 filename = "uv_sphere.obj"
-triangles = ObjReader().read("obj/sphere/" + filename)
+mesh = ObjReader().read("obj/sphere/" + filename)
+triangles = mesh.triangles()
 print triangles[0]
 # triangles = Reader.read("stl/icosahedron.stl")
 g = Graph(triangles)
@@ -98,7 +99,6 @@ if __name__ == '__main__':
 
         #a = intersecting()
         scad_render_to_file(a,'unfold.scad', file_header='$fn = %s;' % SEGMENTS, include_orig_code=True)
-    
     d_writer = DXFWriter(n, ds, filename)
     d_writer.generate_file()
  

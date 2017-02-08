@@ -20,9 +20,13 @@ class Graph:
       v1 = t[0].tolist()
       v2 = t[1].tolist()
       v3 = t[2].tolist()
-      n = t[3].tolist()
+      n  = t[3].tolist() # surface normal
 
-      node = Node(v1,v2,v3,n)
+      t1 = t[4].tolist() # texture
+      t2 = t[5].tolist()
+      t3 = t[6].tolist()
+
+      node = Node(v1,v2,v3,n, t1, t2, t3)
       node.index = i
       self.nodes.append(node)
 
@@ -160,12 +164,16 @@ class Graph:
 
 # Every Node is a triangular face
 class Node:
-  def __init__(self, v1, v2, v3, normal):
+  def __init__(self, v1, v2, v3, normal, n1, n2, n3):
     self.index = -1
     self.v1=v1
     self.v2=v2
     self.v3=v3
     self.n = normal
+
+    self.n1=n1
+    self.n2=n2
+    self.n3=n3
 
     self.edges = [(v1, v2), (v2, v3), (v3, v1)]
     self.children = set()
